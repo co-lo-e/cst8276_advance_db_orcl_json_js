@@ -1,12 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Document</title>
 </head>
-<script src=""></script>
+
 <body>
-	
+	Hello
+	<button onclick="hello()"> say hello</button>
+	<button onclick="posting()"> posting </button>
+	<p id="message"></p>
 </body>
+<script>
+	async function hello() {
+		console.log("hello")
+		const resp = await fetch("/hello");
+		const data = await resp.json();
+		console.log(data);
+
+		const message = document.getElementById("message");
+		message.textContent = data.message;
+	}
+
+	async function posting() {
+		const resp = await fetch("/data", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({ weather: "raining", area: { city : "ottawa"}})
+		})
+	}
+
+</script>
+
 </html>

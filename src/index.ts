@@ -1,26 +1,30 @@
 import cors from "cors";
-import express from "express";
+import express, { Request, Response } from "express";
 import path from "node:path";
 import { testHR } from "./orcl";
 
-
 const app = express();
-app.use(cors())
+app.use(cors());
 
-app.use(express.static(path.join(__dirname, "public")))
+app.use(express.static(path.join(__dirname, "public")));
+app.use(express.json());
 
-// app.get("/", (req, resp) => {
-// 	resp.send("Hello world")
-// })
+app.get("/hello", (req, resp) => {
+	resp.json({ message: "hello world" });
+});
+
+app.post("/data", (req: Request, resp: Response) => {
+	const body = req.body;
+	console.log(body);
+});
 
 const port = 8000;
 app.listen(port, async () => {
-
-	console.log(process.env.ORCL_USER)
-	console.log(process.env.ORCL_PSWD)
-
-	await testHR(103)	;
+	const user = process.env.ORCL_USER;
+	if (user === "hr") {
+		console.log("testing hr.")
+		await testHR(103);
+	}
 
 	console.log("listening on " + port);
-
 });
