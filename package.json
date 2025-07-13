@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "ts-node src/index.ts",
     "build": "bash node_modules/.bin/tsc",
-    "serve": "node dist/index.js",
+    "serve": "bash node_modules/.bin/tsc && node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -14,9 +14,12 @@
   "devDependencies": {
     "@types/express": "^5.0.3",
     "@types/node": "^24.0.10",
+    "@types/oracledb": "^6.6.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "dotenv": "^17.2.0",
     "express": "^5.1.0",
     "oracledb": "^6.8.0"
   }

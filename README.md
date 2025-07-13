@@ -9,8 +9,18 @@ I recommend using `nvm`  as a node version control manager.
 or download from official website 
 - https://nodejs.org/en/download
 
-## dev
-- `npm run dev`
+## Installation
+`npm run install`
 
-## build
-- `npm run build`
+## dev mode
+`npm run dev`
+
+## build mode
+`npm run build`
+
+## serve 
+`npm run serve`
+
+### Oracle Node 
+reference: https://node-oracledb.readthedocs.io/en/latest/user_guide/installation.html#quickstart
+
