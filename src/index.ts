@@ -1,11 +1,10 @@
+import cors from "cors";
 import express from "express";
 import { testHR } from "./orcl";
 
 
-
-
-
 const app = express();
+app.use(cors())
 
 app.get("/", (req, resp) => {
 	resp.send("Hello world")
