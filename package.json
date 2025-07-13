@@ -4,6 +4,9 @@
   "description": "read write json file with oracle db",
   "main": "index.js",
   "scripts": {
+    "dev": "ts-node src/index.ts",
+    "build": "bash node_modules/.bin/tsc",
+    "serve": "node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
