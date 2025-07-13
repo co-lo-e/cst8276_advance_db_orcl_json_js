@@ -3,10 +3,10 @@
 ## Setup 
 Make sure you node install on your machine
 
-I recommend using `nvm`  as a node version control manager.
+use `nvm`  as a node version control manager.
 - https://github.com/nvm-sh/nvm
 
-or download from official website 
+or download it from official website 
 - https://nodejs.org/en/download
 
 ## Installation
