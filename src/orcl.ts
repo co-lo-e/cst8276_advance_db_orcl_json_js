@@ -1,3 +1,18 @@
+/**
+ * This module provides comprehensive CRUD (Create, Read, Update, Delete) operations
+ * for managing JSON data in Oracle Database. It leverages Oracle's native JSON
+ * capabilities to store, query, and manipulate JSON documents efficiently.
+ *
+ * Features:
+ * - JSON data insertion (single and bulk operations)
+ * - JSON data retrieval (all records and by ID)
+ * - JSON data updates by ID
+ * - JSON data deletion by ID
+ * - Proper error handling and connection management
+ * - Oracle DB_TYPE_JSON for optimal JSON storage
+ *
+ */
+
 import "dotenv/config";
 import oracledb from "oracledb";
 
@@ -19,7 +34,7 @@ export async function insert(data: Housing) {
 			{ bv: { val: data, type: oracledb.DB_TYPE_JSON } },
 			{ autoCommit: true }
 		);
-		console.log(`Inserted: ${result.rows?.length} row` )
+		console.log(`Inserted: ${result.rows?.length} row`);
 		return result;
 	} catch (error) {
 		console.error("insert failed: " + error);
