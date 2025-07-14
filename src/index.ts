@@ -21,10 +21,12 @@ app.post("/data", (req: Request, resp: Response) => {
 const port = 8000;
 app.listen(port, async () => {
 	const user = process.env.ORCL_USER;
+
 	if (user === "hr") {
 		console.log("testing hr.")
 		await testHR(103);
 	}
+
 
 	console.log("listening on " + port);
 });

@@ -4,6 +4,7 @@
   "description": "read write json file with oracle db",
   "main": "index.js",
   "scripts": {
+    "seed": "ts-node src/seed.ts",
     "dev": "ts-node src/index.ts",
     "build": "bash node_modules/.bin/tsc",
     "serve": "bash node_modules/.bin/tsc && node dist/index.js",
