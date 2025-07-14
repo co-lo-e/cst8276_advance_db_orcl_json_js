@@ -24,10 +24,18 @@ const credentials = {
 } as const;
 
 const db = "housing_json_data" as const;
+let connection: oracledb.Connection | null;
 
+async function getConnection() {
+	if (!connection) {
+		connection = await oracledb.getConnection(credentials);
+		console.log(`Connected to ${db} at ${credentials.connectString}`);
+	}
+	return connection;
+}
 
 export async function insert(data: Housing) {
-	const connection = await oracledb.getConnection(credentials);
+	const connection = await getConnection();
 	try {
 		const result = await connection.execute(
 			` INSERT INTO ${db} (json_data) VALUES
@@ -47,7 +55,7 @@ export async function insert(data: Housing) {
 }
 
 export async function insertBulk(data: Housing[]) {
-	const connection = await oracledb.getConnection(credentials);
+	const connection = await getConnection();
 	try {
 		const sql = `INSERT INTO ${db} (json_data) VALUES (:json)`;
 		const binds = data.map((item) => ({ json: item as any }));
@@ -88,7 +96,7 @@ export async function readAll() {
 }
 
 export async function readById(id: number) {
-	const connection = await oracledb.getConnection(credentials);
+	const connection = await getConnection();
 	try {
 		const sql = `SELECT json_data from ${db} WHERE id = :id`;
 		const result = await connection.execute<Housing>(sql, [id], {
@@ -105,8 +113,101 @@ export async function readById(id: number) {
 	}
 }
 
+function cap(word: string) {
+	return word.charAt(0).toUpperCase() + word.substring(1);
+}
+
+/**
+ * 
+o [x]	Use dot-notation for simple lookup.
+o	 Use JSON Query for returning arrays.
+o	Utilize JSON Table to flatten JSON arrays into relational views.
+ */
+export async function readByDotNotation(
+	columns: string[],
+	where?: { col: string; value: string; isString?: boolean }
+) {
+	const connection = await getConnection();
+	let binds = [];
+	try {
+		const abbr = db.charAt(0).toLocaleLowerCase();
+		const dotQuery =
+			columns.length > 0
+				? columns.map((col) => {
+					const splitted = col.split(".");
+					const last = splitted[splitted.length -1 ];
+					const cappedCol = splitted.map( col => cap(col)).join(".")
+					return `'${cap(col)}' value ${abbr}.json_data.${cappedCol}`
+				}).join(", ")
+				: "json_data";
+
+		let sql = `SELECT JSON_OBJECT(${dotQuery}) as json_data from ${db} ${abbr} `;
+		if (where) {
+			const operator = where.isString ? "LIKE" : "=";
+			sql += `WHERE ${db}.json_data.${cap(where.col)} ${operator} :whereValue `;
+			binds.push(where.value);
+		}
+		console.log("Generated SQL:", sql);
+
+		const result = await connection.execute(sql, binds, {
+			outFormat: oracledb.OUT_FORMAT_OBJECT,
+		});
+		return result;
+	} catch (error) {
+		console.error(error);
+		throw error;
+	} finally {
+		await connection.close();
+	}
+}
+
+export async function readByJsonQuery(
+	columns: string[],
+	where?: { col: string; value: string; isString?: boolean }
+) {
+	const connection = await getConnection();
+	try {
+		// const abbr = db.charAt(0).toLowerCase();
+		let binds = [];
+		const jsonQuery =
+			columns.length > 0
+				? columns
+						.map((col) => {
+							const splitted = col.split(".");
+							const cappedCol = splitted.map((str) => cap(str)).join(".");
+							const last = splitted[splitted.length - 1];
+							return `'${cap(last)}' value json_query(json_data, '$.${cappedCol}')`;
+						})
+						.join(", ")
+				: "json_data";
+
+		let sql = `SELECT json_object(${jsonQuery}) as json_data from ${db} `;
+
+		if (where) {
+			const operator = where.isString ? "LIKE" : "=";
+			const cappedWhereCol = where.col
+				.split(".")
+				.map((str) => cap(str))
+				.join(".");
+			sql += `WHERE json_data.${cappedWhereCol} ${operator} :whereValue `;
+			binds.push(where.value);
+		}
+		console.log("Generated SQL:", sql);
+		const result = await connection.execute(sql, binds, {
+			outFormat: oracledb.OUT_FORMAT_OBJECT,
+		});
+		console.log(`Read with JSON_QUERY: ${result.rows?.length} rows.`);
+		return result;
+	} catch (error) {
+		console.error(error);
+		throw error;
+	} finally {
+		await connection.close();
+	}
+}
+
 export async function update(id: number, data: Housing) {
-	const connection = await oracledb.getConnection(credentials);
+	const connection = await getConnection();
 	try {
 		const result = await connection.execute(
 			` UPDATE ${db} SET json_data = :bv WHERE id = :id`,
@@ -127,7 +228,7 @@ export async function update(id: number, data: Housing) {
 }
 
 export async function deleteById(id: number) {
-	const connection = await oracledb.getConnection(credentials);
+	const connection = await getConnection();
 	try {
 		const result = await connection.execute(
 			`DELETE FROM ${db} WHERE id = :id `,

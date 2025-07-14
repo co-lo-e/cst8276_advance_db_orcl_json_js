@@ -2,7 +2,7 @@ import jsonData from "../data/ab_housing_starts_by_municipality.json";
 import { insertBulk, readAll } from "./orcl";
 
 
-export async function seed() {
+async function seed() {
 
 	    try {
         console.log("Checking if table is empty...");
