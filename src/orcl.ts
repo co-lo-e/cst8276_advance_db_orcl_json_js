@@ -16,6 +16,7 @@
 import "dotenv/config";
 import oracledb from "oracledb";
 import type { Housing } from "./types";
+import { cap } from "./utils";
 
 const credentials = {
 	user: process.env.ORCL_USER,
@@ -24,18 +25,10 @@ const credentials = {
 } as const;
 
 const db = "housing_json_data" as const;
-let connection: oracledb.Connection | null;
 
-async function getConnection() {
-	if (!connection) {
-		connection = await oracledb.getConnection(credentials);
-		console.log(`Connected to ${db} at ${credentials.connectString}`);
-	}
-	return connection;
-}
 
 export async function insert(data: Housing) {
-	const connection = await getConnection();
+	const connection = await oracledb.getConnection(credentials);
 	try {
 		const result = await connection.execute(
 			` INSERT INTO ${db} (json_data) VALUES
@@ -55,7 +48,7 @@ export async function insert(data: Housing) {
 }
 
 export async function insertBulk(data: Housing[]) {
-	const connection = await getConnection();
+	const connection = await oracledb.getConnection(credentials);
 	try {
 		const sql = `INSERT INTO ${db} (json_data) VALUES (:json)`;
 		const binds = data.map((item) => ({ json: item as any }));
@@ -96,7 +89,7 @@ export async function readAll() {
 }
 
 export async function readById(id: number) {
-	const connection = await getConnection();
+	const connection = await oracledb.getConnection(credentials);
 	try {
 		const sql = `SELECT json_data from ${db} WHERE id = :id`;
 		const result = await connection.execute<Housing>(sql, [id], {
@@ -113,40 +106,61 @@ export async function readById(id: number) {
 	}
 }
 
-function cap(word: string) {
-	return word.charAt(0).toUpperCase() + word.substring(1);
-}
 
 /**
  * 
 o [x]	Use dot-notation for simple lookup.
-o	 Use JSON Query for returning arrays.
+o	[x] Use JSON Query for returning arrays.
 o	Utilize JSON Table to flatten JSON arrays into relational views.
  */
+export async function readSingleByDotNotation(
+	columns: string[],
+	where: { col: string; value: string; isString?: boolean }
+) {
+	const result = await readByDotNotation(columns, {...where, limit :1 })
+	if(result.rows?.length) {
+		return result.rows[0];
+	}
+	return null;
+}
 export async function readByDotNotation(
 	columns: string[],
-	where?: { col: string; value: string; isString?: boolean }
+	where?: { col: string; value: string; isString?: boolean, limit?: number }
 ) {
-	const connection = await getConnection();
+	const connection = await oracledb.getConnection(credentials);
 	let binds = [];
 	try {
 		const abbr = db.charAt(0).toLocaleLowerCase();
 		const dotQuery =
 			columns.length > 0
-				? columns.map((col) => {
-					const splitted = col.split(".");
-					const last = splitted[splitted.length -1 ];
-					const cappedCol = splitted.map( col => cap(col)).join(".")
-					return `'${cap(col)}' value ${abbr}.json_data.${cappedCol}`
-				}).join(", ")
+				? columns
+						.map((col) => {
+							const splitted = col.split(".");
+							const last = splitted[splitted.length - 1];
+							const cappedCol = splitted.map((col) => cap(col)).join(".");
+							// return `'${cap(last)}' value ${abbr}.json_data.${cappedCol}`
+							return `${abbr}.json_data.${cappedCol} as "${cap(last)}"`;
+						})
+						.join(", ")
 				: "json_data";
 
-		let sql = `SELECT JSON_OBJECT(${dotQuery}) as json_data from ${db} ${abbr} `;
+		// let sql = `SELECT JSON_OBJECT(${dotQuery}) as json_data from ${db} ${abbr} `;
+		let sql = `SELECT ${dotQuery} from ${db} ${abbr} `;
 		if (where) {
 			const operator = where.isString ? "LIKE" : "=";
-			sql += `WHERE ${db}.json_data.${cap(where.col)} ${operator} :whereValue `;
+			const cappedWhereCol = where.col
+				.split(".")
+				.map((str) => cap(str))
+				.join(".");
+			sql += ` WHERE JSON_VALUE(${abbr}.json_data, '$.${cappedWhereCol}') ${operator} :whereValue`;
 			binds.push(where.value);
+
+			if ( where.limit) {
+				sql += `Fetch first ${where.limit} rows only` 
+			}
 		}
+
+
 		console.log("Generated SQL:", sql);
 
 		const result = await connection.execute(sql, binds, {
@@ -165,9 +179,9 @@ export async function readByJsonQuery(
 	columns: string[],
 	where?: { col: string; value: string; isString?: boolean }
 ) {
-	const connection = await getConnection();
+	const connection = await oracledb.getConnection(credentials);
 	try {
-		// const abbr = db.charAt(0).toLowerCase();
+		const abbr = db.charAt(0).toLowerCase();
 		let binds = [];
 		const jsonQuery =
 			columns.length > 0
@@ -176,12 +190,18 @@ export async function readByJsonQuery(
 							const splitted = col.split(".");
 							const cappedCol = splitted.map((str) => cap(str)).join(".");
 							const last = splitted[splitted.length - 1];
-							return `'${cap(last)}' value json_query(json_data, '$.${cappedCol}')`;
+							// return `'${cap(last)}' value json_query(json_data, '$.${cappedCol}')`;
+							return `json_query(json_data, '$.${cappedCol}') as "${cap(
+								last
+							)}"`;
+							// return `JSON_VALUE(JSON_QUERY(json_data, '$.${cappedCol}'), '$') as "${cap(last)}"`;
 						})
 						.join(", ")
+
 				: "json_data";
 
-		let sql = `SELECT json_object(${jsonQuery}) as json_data from ${db} `;
+		// let sql = `SELECT json_object(${jsonQuery}) as json_data from ${db} ${abbr} `;
+		let sql = `SELECT ${jsonQuery} from ${db} ${abbr} `;
 
 		if (where) {
 			const operator = where.isString ? "LIKE" : "=";
@@ -189,7 +209,7 @@ export async function readByJsonQuery(
 				.split(".")
 				.map((str) => cap(str))
 				.join(".");
-			sql += `WHERE json_data.${cappedWhereCol} ${operator} :whereValue `;
+			sql += ` WHERE JSON_VALUE(json_data, '$.${cappedWhereCol}') ${operator} :whereValue`;
 			binds.push(where.value);
 		}
 		console.log("Generated SQL:", sql);
@@ -207,7 +227,7 @@ export async function readByJsonQuery(
 }
 
 export async function update(id: number, data: Housing) {
-	const connection = await getConnection();
+	const connection = await oracledb.getConnection(credentials);
 	try {
 		const result = await connection.execute(
 			` UPDATE ${db} SET json_data = :bv WHERE id = :id`,
@@ -228,7 +248,7 @@ export async function update(id: number, data: Housing) {
 }
 
 export async function deleteById(id: number) {
-	const connection = await getConnection();
+	const connection = await oracledb.getConnection(credentials);
 	try {
 		const result = await connection.execute(
 			`DELETE FROM ${db} WHERE id = :id `,
