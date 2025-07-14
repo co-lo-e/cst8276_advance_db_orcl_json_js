@@ -1,39 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
-</head>
+	<meta charset="UTF-8" />
+	<title>Housing JSON Data Viewer</title>
+	<style>
+		body {
+		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		background: #eef2f5;
+		color: #333;
+		margin: 0;
+		padding: 0;
+		}
 
-<body>
-	Hello
-	<button onclick="hello()"> say hello</button>
-	<button onclick="posting()"> posting </button>
-	<p id="message"></p>
-</body>
-<script>
-	async function hello() {
-		console.log("hello")
-		const resp = await fetch("/hello");
-		const data = await resp.json();
-		console.log(data);
+		header {
+		background-color: #45787c;
+		color: white;
+		padding: 20px 0;
+		text-align: center;
+		box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+		margin-bottom: 30px;
+		}
 
-		const message = document.getElementById("message");
-		message.textContent = data.message;
-	}
+		.container {
+		max-width: 900px;
+		margin: 0 auto;
+		padding: 0 20px;
+		}
 
-	async function posting() {
-		const resp = await fetch("/data", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify({ weather: "raining", area: { city : "ottawa"}})
+		.record {
+		background: white;
+		border: 1px solid #ddd;
+		border-radius: 8px;
+		padding: 20px;
+		margin-bottom: 25px;
+		box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+		transition: transform 0.2s;
+		}
+
+		.record:hover {
+		transform: scale(1.01);
+		}
+
+		.record-header {
+		font-weight: 600;
+		margin-bottom: 10px;
+		color: #2c3e50;
+		font-size: 1.1em;
+		}
+
+		.record-content {
+		white-space: pre-wrap;
+		font-family: Consolas, monospace;
+		font-size: 0.95em;
+		background: #f9f9f9;
+		padding: 12px;
+		border-radius: 4px;
+		margin-bottom: 12px;
+		}
+
+		.button-group {
+		display: flex;
+		gap: 10px;
+		}
+
+		.button-group button {
+		padding: 6px 12px;
+		border: none;
+		border-radius: 4px;
+		font-size: 0.9em;
+		cursor: pointer;
+		transition: background-color 0.2s;
+		}
+
+		.edit-button {
+		background-color: #27ae60;
+		color: white;
+		}
+
+		.edit-button:hover {
+		background-color: #219150;
+		}
+
+		.delete-button {
+		background-color: #c0392b;
+		color: white;
+		}
+
+		.delete-button:hover {
+		background-color: #a93226;
+		}
+
+		.download-button {
+		background-color: #f39c12;
+		color: white;
+		}
+
+		.download-button:hover {
+		background-color: #d78b0c;
+		}
+
+	</style>
+	</head>
+	<body>
+	<header>
+		<h1>Housing JSON Records Viewer</h1>
+	</header>
+	<div class="container" id="data-container">
+		Loading data...
+	</div>
+
+	<script>
+	fetch('http://localhost:3001/api/housing')
+		.then(response => response.json())
+		.then(data => {
+		const container = document.getElementById('data-container');
+		container.innerHTML = '';
+
+		// Create table element
+		const table = document.createElement('table');
+		table.style.width = '100%';
+		table.style.borderCollapse = 'collapse';
+		table.style.marginBottom = '30px';
+
+		// Table headers
+		const thead = document.createElement('thead');
+		thead.innerHTML = `
+			<tr style="background-color: #3498db; color: white;">
+			<th style="padding: 10px; border: 1px solid #ccc;">Record ID</th>
+			<th style="padding: 10px; border: 1px solid #ccc;">CSDUID</th>
+			<th style="padding: 10px; border: 1px solid #ccc;">CSD</th>
+			<th style="padding: 10px; border: 1px solid #ccc;">Period</th>
+			<th style="padding: 10px; border: 1px solid #ccc;">Indicator</th>
+			<th style="padding: 10px; border: 1px solid #ccc;">Housing Type</th>
+			<th style="padding: 10px; border: 1px solid #ccc;">Original Value</th>
+			<th style="padding: 10px; border: 1px solid #ccc;">Actions</th>
+			</tr>
+		`;
+		table.appendChild(thead);
+
+		// Table body
+		const tbody = document.createElement('tbody');
+
+		data.forEach(record => {
+			const json = record.json;
+
+			const tr = document.createElement('tr');
+			tr.innerHTML = `
+			<td style="padding: 8px; border: 1px solid #ccc; text-align:center;">${record.id}</td>
+			<td style="padding: 8px; border: 1px solid #ccc;">${json.CSDUID}</td>
+			<td style="padding: 8px; border: 1px solid #ccc;">${json.CSD}</td>
+			<td style="padding: 8px; border: 1px solid #ccc;">${json.Period}</td>
+			<td style="padding: 8px; border: 1px solid #ccc;">${json.IndicatorSummaryDescription}</td>
+			<td style="padding: 8px; border: 1px solid #ccc;">${json.Dimensions[0]?.Value || ''}</td>
+			<td style="padding: 8px; border: 1px solid #ccc; text-align:right;">${json.OriginalValue}</td>
+			<td style="padding: 8px; border: 1px solid #ccc; text-align:center;">
+				<button style="background-color:#27ae60; color:white; border:none; border-radius:4px; padding:4px 8px; cursor:pointer;">Edit</button>
+				<button style="background-color:#c0392b; color:white; border:none; border-radius:4px; padding:4px 8px; cursor:pointer;">Delete</button>
+				<button style="background-color:#f39c12; color:white; border:none; border-radius:4px; padding:4px 8px; cursor:pointer;">Download</button>
+			</td>
+			`;
+			tbody.appendChild(tr);
+		});
+
+		table.appendChild(tbody);
+		container.appendChild(table);
 		})
-	}
+		.catch(error => {
+		console.error('Error fetching data:', error);
+		document.getElementById('data-container').textContent = 'Failed to load data.';
+		});
+	</script>
 
-</script>
-
+</body>
 </html>
