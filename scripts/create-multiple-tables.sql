@@ -1,3 +1,9 @@
+-- ***********DROP TABLES***********
+
+DROP TABLE IF EXISTS HousingInfo;
+DROP TABLE IF EXISTS HousingType;
+DROP TABLE IF EXISTS Location;
+
 -- ***********CREATE TABLES***********
 
 -- table example:
