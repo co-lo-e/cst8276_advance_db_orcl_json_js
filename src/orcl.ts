@@ -15,6 +15,7 @@
 
 import "dotenv/config";
 import oracledb from "oracledb";
+import type { Housing } from "./types";
 
 const credentials = {
 	user: process.env.ORCL_USER,
@@ -23,6 +24,7 @@ const credentials = {
 } as const;
 
 const db = "housing_json_data" as const;
+
 
 export async function insert(data: Housing) {
 	const connection = await oracledb.getConnection(credentials);

@@ -1,11 +1,11 @@
-interface Dimension {
+export interface Dimension {
 	Name: string;
 	Value: string;
 	IsDisplay: boolean;
 	DisplayOrder: number;
 }
 
-interface Housing {
+export interface Housing {
 	CSDUID: string;
 	CSD: string;
 	Period: string;
