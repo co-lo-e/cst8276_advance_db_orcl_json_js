@@ -31,3 +31,89 @@ Make sure you have created `housing_json_data`
 ### Oracle Node 
 reference: https://node-oracledb.readthedocs.io/en/latest/user_guide/installation.html#quickstart
 
+
+### Ending points
+
+#### Housing API Endpoints
+
+**Create a housing record**
+```sh
+curl -X POST http://localhost:8000/housing \
+  -H "Content-Type: application/json" \
+  -d '{
+    "CSDUID": "4806016",
+    "CSD": "Red Deer",
+    "Period": "2025-07",
+    "IndicatorSummaryDescription": "Some description",
+    "Dimensions": [{"Name": "Type", "Value": "Detached", "IsDisplay": true, "DisplayOrder": 1}],
+    "UnitOfMeasure": "units",
+    "OriginalValue": 123
+  }'
+```
+
+**Create multiple housing records (bulk)**
+```sh
+curl -X POST http://localhost:8000/housing/bulk \
+  -H "Content-Type: application/json" \
+  -d '[
+    {
+      "CSDUID": "4806016",
+      "CSD": "Red Deer",
+      "Period": "2025-07",
+      "IndicatorSummaryDescription": "Some description",
+      "Dimensions": [{"Name": "Type", "Value": "Detached", "IsDisplay": true, "DisplayOrder": 1}],
+      "UnitOfMeasure": "units",
+      "OriginalValue": 123
+    },
+    {
+      "CSDUID": "4806017",
+      "CSD": "Calgary",
+      "Period": "2025-07",
+      "IndicatorSummaryDescription": "Another description",
+      "Dimensions": [{"Name": "Type", "Value": "Apartment", "IsDisplay": true, "DisplayOrder": 2}],
+      "UnitOfMeasure": "units",
+      "OriginalValue": 456
+    }
+  ]'
+```
+
+**Get all housing records**
+```sh
+curl -X GET http://localhost:8000/housing
+```
+
+**Get housing record by ID**
+```sh
+curl -X GET http://localhost:8000/housing/123
+```
+
+**Query by dot notation**
+```sh
+curl -X GET "http://localhost:8000/housing/dot?select=Dimensions.Value,CSDUID&where=CSD&value=Red%20Deer"
+```
+
+**Query by JSON query**
+```sh
+curl -X GET "http://localhost:8000/housing/jq?select=Dimensions.Value,CSDUID&where=CSD&value=Red%20Deer"
+```
+
+**Update housing record by ID**
+```sh
+curl -X PUT http://localhost:8000/housing/123 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "CSDUID": "4806016",
+    "CSD": "Red Deer",
+    "Period": "2025-08",
+    "IndicatorSummaryDescription": "Updated description",
+    "Dimensions": [{"Name": "Type", "Value": "Detached", "IsDisplay": true, "DisplayOrder": 1}],
+    "UnitOfMeasure": "units",
+    "OriginalValue": 789
+  }'
+```
+
+**Delete housing record by ID**
+```sh
+curl -X DELETE http://localhost:8000/housing/123
+```
+
