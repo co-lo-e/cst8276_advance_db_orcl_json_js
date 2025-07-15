@@ -18,7 +18,7 @@
 
 	async function hello() {
 		console.log("hello")
-		const resp = await fetch("/housing/1");
+		const resp = await fetch("/housing/jq?select=Dimensions.Value,CSDUID&where=CSD&value=Red Deer&string=true");
 		const data = await resp.json();
 		console.log(data);
 
