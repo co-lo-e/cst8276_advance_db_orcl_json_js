@@ -29,15 +29,21 @@ const db = "housing_json_data" as const;
 export async function insert(data: Housing) {
 	const connection = await oracledb.getConnection(credentials);
 	try {
-		const result = await connection.execute(
+		const result = await connection.execute<{ outId: number}>(
 			` INSERT INTO ${db} (json_data) VALUES
 			(:bv)
+			RETURNING id INTO :outId
 		`,
-			{ bv: { val: data, type: oracledb.DB_TYPE_JSON } },
+			{
+				bv: { val: data, type: oracledb.DB_TYPE_JSON },
+				outId: { type: oracledb.NUMBER, dir: oracledb.BIND_OUT },
+			},
 			{ autoCommit: true }
 		);
 		console.log(`Inserted: ${result.rows?.length} row`);
-		return result;
+		const newId = result.outBinds?.outId;
+		console.log(`Inserted row with id: ${newId}`);
+		return newId;
 	} catch (error) {
 		console.error("insert failed: " + error);
 		throw error;
@@ -73,9 +79,16 @@ export async function insertBulk(data: Housing[]) {
 export async function readAll() {
 	const connection = await oracledb.getConnection(credentials);
 	try {
-		const sql = `SELECT JSON_SERIALIZE(json_data PRETTY) from ${db}`;
-		const result = await connection.execute(sql);
-		const rows = result.rows?.map((r: any) => JSON.parse(r));
+		const sql = `SELECT  id, JSON_SERIALIZE(json_data PRETTY) as json_data from ${db}`;
+		const result = await connection.execute(sql, [], {
+			outFormat: oracledb.OUT_FORMAT_OBJECT,
+		});
+		console.log(result.rows);
+		const rows = result.rows?.map((r: any) => {
+
+			const jsonData = JSON.parse(r["JSON_DATA"]);
+			return {id: r['ID'], jsonData: jsonData}
+		});
 		console.dir(rows, { depth: null });
 		console.log(`Read: ${result.rows?.length} rows.`);
 		return rows;
@@ -90,15 +103,20 @@ export async function readAll() {
 export async function readById(id: number) {
 	const connection = await oracledb.getConnection(credentials);
 	try {
-		const sql = `SELECT JSON_SERIALIZE(json_data) from ${db} WHERE id = :id`;
+		const sql = `SELECT JSON_SERIALIZE(json_data) as json_data from ${db} WHERE id = :id`;
 		const result = await connection.execute(sql, [id], {
 			outFormat: oracledb.OUT_FORMAT_OBJECT,
 		});
 
-		const rows = result.rows?.map((r: any) => JSON.parse(r));
-		console.log(`Read: ${rows}.`);
+		const rows = result.rows?.map((r: any) => JSON.parse(r["JSON_DATA"]));
+		console.log(rows);
+		console.log(`Read: ${result.rows}.`);
 		console.log(`Read: ${result.rowsAffected} rows.`);
-		return rows;
+
+		if (!rows || rows.length < 1) {
+			return null;
+		}
+		return rows[0];
 	} catch (error) {
 		console.error("Read by Id failed: " + error);
 		throw error;
