@@ -81,14 +81,14 @@ export async function getHousingById(req: Request, res: Response) {
 
 		const result = await orcl.readById(id);
 
-		if (!result.rows || result.rows.length === 0) {
+		if (!result || result.length === 0) {
 			res.status(404).json({ error: "Housing record not found" });
 			return;
 		}
 
 		res.status(200).json({
 			success: true,
-			data: result.rows[0],
+			data: result[0],
 		});
 	} catch (error) {
 		console.error("Get housing by ID error:", error);
@@ -140,8 +140,8 @@ export async function queryHousingByDotNotation(req: Request, res: Response) {
 
 		res.status(200).json({
 			success: true,
-			count: result?.rows?.length || 0,
-			data: result?.rows,
+			count: result?.length || 0,
+			data: result,
 		});
 	} catch (error) {
 		console.error("Query housing error:", error);

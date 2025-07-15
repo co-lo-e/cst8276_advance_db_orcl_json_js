@@ -10,8 +10,8 @@ async function seed() {
         // Check if table has any data
         const existingData = await readAll();
         
-        if (existingData.rows && existingData.rows.length > 0) {
-            console.log(`Table already contains ${existingData.rows.length} records. Skipping seed.`);
+        if (existingData && existingData.length > 0) {
+            console.log(`Table already contains ${existingData.length} records. Skipping seed.`);
             return;
         }
         
