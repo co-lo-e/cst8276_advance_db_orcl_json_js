@@ -58,8 +58,8 @@ export async function getAllHousing(req: Request, res: Response) {
 		const result = await orcl.readAll();
 		res.status(200).json({
 			success: true,
-			count: result.rows?.length || 0,
-			data: result.rows,
+			count: result?.length || 0,
+			data: result,
 		});
 	} catch (error) {
 		console.error("Get all housing error:", error);
@@ -152,6 +152,8 @@ export async function queryHousingByDotNotation(req: Request, res: Response) {
 	}
 }
 
+
+
 export async function queryByJsonQuery(req: Request, res: Response) {
 	try {
 		const { select = [], where, value, string = false } = req.query;
@@ -177,8 +179,8 @@ export async function queryByJsonQuery(req: Request, res: Response) {
 
 		res.status(200).json({
 			success: true,
-			count: result?.rows?.length || 0,
-			data: result?.rows,
+			count: result?.length || 0,
+			data: result,
 		});
 	} catch (error) {
 		console.error("Query housing error:", error);
