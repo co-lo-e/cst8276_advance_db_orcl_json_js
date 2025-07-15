@@ -27,6 +27,7 @@
 		padding: 0 20px;
 		}
 
+<<<<<<< HEAD
 		.record {
 		background: white;
 		border: 1px solid #ddd;
@@ -36,6 +37,13 @@
 		box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 		transition: transform 0.2s;
 		}
+=======
+	async function hello() {
+		console.log("hello")
+		const resp = await fetch("/housing/jq?select=Dimensions.Value,CSDUID&where=CSD&value=Red Deer&string=true");
+		const data = await resp.json();
+		console.log(data);
+>>>>>>> 7cddc55 (demo)
 
 		.record:hover {
 		transform: scale(1.01);
