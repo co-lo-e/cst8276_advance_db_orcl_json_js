@@ -143,7 +143,7 @@
       }
     },
     {
-      "name": "Udpate Housing Data",
+      "name": "Update Housing Data",
       "request": {
         "method": "PUT",
         "header": [
@@ -153,19 +153,44 @@
           }
         ],
         "url": {
-          "raw": "http://localhost:8000/housing",
+          "raw": "http://localhost:8000/housing/22225",
           "protocol": "http",
           "host": [
             "localhost"
           ],
           "port": "8000",
           "path": [
-            "housing"
+            "housing",
+            22225
           ]
         },
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"CSDUID\": \"999999\",\n  \"CSD\": \"TEST\",\n  \"Period\": \"2222\",\n  \"IndicatorSummaryDescription\": \"Housing Finished\",\n  \"Dimensions\": [\n    {\n      \"Name\": \"Housing Type\",\n      \"Value\": \"Spaceship\",\n      \"IsDisplay\": true,\n      \"DisplayOrder\": 0\n    }\n  ],\n  \"UnitOfMeasure\": \"\",\n  \"OriginalValue\": 12\n}"
+          "raw": "{\n  \"CSDUID\": \"999889\",\n  \"CSD\": \"UPDATE\",\n  \"Period\": \"2299\",\n  \"IndicatorSummaryDescription\": \"Housing Finished\",\n  \"Dimensions\": [\n    {\n      \"Name\": \"Housing Type\",\n      \"Value\": \"Spaceship\",\n      \"IsDisplay\": true,\n      \"DisplayOrder\": 0\n    }\n  ],\n  \"UnitOfMeasure\": \"\",\n  \"OriginalValue\": 12\n}"
+        }
+      }
+    },
+    {
+      "name": "Delete Housing Data",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8000/housing/22225",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "housing",
+            22225
+          ]
         }
       }
     }
