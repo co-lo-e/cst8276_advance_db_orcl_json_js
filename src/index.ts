@@ -11,7 +11,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 
 app.get("/housing", getAllHousing);
-app.get("/housing/:id", getHousingById);
+app.get("/housing/id/:id", getHousingById);
 app.post("/housing", createHousing);
 app.put("/housing/:id", updateHousing);
 app.delete("/housing/:id", deleteHousing);

@@ -13,15 +13,12 @@
 	<button onclick="posting()"> posting </button>
 	<p id="message"></p>
 </body>
-<script type="module">
-	import { readAll} from "../orcl"
+<script >
 
-	const stuff = await readAll();
-	console.log(stuff);
 
 	async function hello() {
 		console.log("hello")
-		const resp = await fetch("/hello");
+		const resp = await fetch("/housing/1");
 		const data = await resp.json();
 		console.log(data);
 
