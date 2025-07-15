@@ -26,7 +26,6 @@ const credentials = {
 
 const db = "housing_json_data" as const;
 
-
 export async function insert(data: Housing) {
 	const connection = await oracledb.getConnection(credentials);
 	try {
@@ -74,12 +73,12 @@ export async function insertBulk(data: Housing[]) {
 export async function readAll() {
 	const connection = await oracledb.getConnection(credentials);
 	try {
-		const sql = `SELECT json_data from ${db}`;
-		const result = await connection.execute<Housing[]>(sql, [], {
-			outFormat: oracledb.OUT_FORMAT_OBJECT,
-		});
+		const sql = `SELECT JSON_SERIALIZE(json_data PRETTY) from ${db}`;
+		const result = await connection.execute(sql);
+		const rows = result.rows?.map((r: any) => JSON.parse(r));
+		console.dir(rows, { depth: null });
 		console.log(`Read: ${result.rows?.length} rows.`);
-		return result;
+		return rows;
 	} catch (error) {
 		console.error("Read All failed: " + error);
 		throw error;
@@ -106,7 +105,6 @@ export async function readById(id: number) {
 	}
 }
 
-
 /**
  * 
 o [x]	Use dot-notation for simple lookup.
@@ -117,15 +115,15 @@ export async function readSingleByDotNotation(
 	columns: string[],
 	where: { col: string; value: string; isString?: boolean }
 ) {
-	const result = await readByDotNotation(columns, {...where, limit :1 })
-	if(result.rows?.length) {
+	const result = await readByDotNotation(columns, { ...where, limit: 1 });
+	if (result.rows?.length) {
 		return result.rows[0];
 	}
 	return null;
 }
 export async function readByDotNotation(
 	columns: string[],
-	where?: { col: string; value: string; isString?: boolean, limit?: number }
+	where?: { col: string; value: string; isString?: boolean; limit?: number }
 ) {
 	const connection = await oracledb.getConnection(credentials);
 	let binds = [];
@@ -155,20 +153,53 @@ export async function readByDotNotation(
 			sql += ` WHERE JSON_VALUE(${abbr}.json_data, '$.${cappedWhereCol}') ${operator} :whereValue`;
 			binds.push(where.value);
 
-			if ( where.limit) {
-				sql += `Fetch first ${where.limit} rows only` 
+			if (where.limit) {
+				sql += `Fetch first ${where.limit} rows only`;
 			}
 		}
-
 
 		console.log("Generated SQL:", sql);
 
 		const result = await connection.execute(sql, binds, {
 			outFormat: oracledb.OUT_FORMAT_OBJECT,
 		});
+
 		return result;
 	} catch (error) {
 		console.error(error);
+		throw error;
+	} finally {
+		await connection.close();
+	}
+}
+export async function flattenDimensions() {
+	const connection = await oracledb.getConnection(credentials);
+	try {
+		const sql = `
+            SELECT
+                t.id,
+                jt.Name,
+                jt.Value,
+                jt.IsDisplay,
+                jt.DisplayOrder
+            FROM ${db} t,
+                JSON_TABLE(
+                    t.json_data,
+                    '$.Dimensions[*]'
+                    COLUMNS (
+                        Name VARCHAR2(100) PATH '$.Name',
+                        Value VARCHAR2(100) PATH '$.Value',
+                        IsDisplay NUMBER(1) PATH '$.IsDisplay',
+                        DisplayOrder NUMBER PATH '$.DisplayOrder'
+                    )
+                ) jt
+        `;
+		const result = await connection.execute(sql, [], {
+			outFormat: oracledb.OUT_FORMAT_OBJECT,
+		});
+		return result.rows;
+	} catch (error) {
+		console.error("Flatten Dimensions failed: " + error);
 		throw error;
 	} finally {
 		await connection.close();
@@ -194,10 +225,9 @@ export async function readByJsonQuery(
 							return `json_query(json_data, '$.${cappedCol}') as "${cap(
 								last
 							)}"`;
-							// return `JSON_VALUE(JSON_QUERY(json_data, '$.${cappedCol}'), '$') as "${cap(last)}"`;
+							// return `JSON_QUERY(JSON_QUERY(json_data, '$.Dimensions')) as "${cap(last)}"`;
 						})
 						.join(", ")
-
 				: "json_data";
 
 		// let sql = `SELECT json_object(${jsonQuery}) as json_data from ${db} ${abbr} `;
@@ -213,11 +243,25 @@ export async function readByJsonQuery(
 			binds.push(where.value);
 		}
 		console.log("Generated SQL:", sql);
+
 		const result = await connection.execute(sql, binds, {
 			outFormat: oracledb.OUT_FORMAT_OBJECT,
 		});
+
+		const rows = result.rows?.map((row: any) => {
+			const parsed: any = {};
+			for (const key in row) {
+				try {
+					parsed[key] = JSON.parse(row[key]);
+				} catch {
+					parsed[key] = row[key];
+				}
+			}
+			return parsed;
+		});
+
 		console.log(`Read with JSON_QUERY: ${result.rows?.length} rows.`);
-		return result;
+		return rows;
 	} catch (error) {
 		console.error(error);
 		throw error;
