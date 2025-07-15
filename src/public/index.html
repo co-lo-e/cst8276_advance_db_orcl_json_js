@@ -116,7 +116,7 @@
 	</div>
 
 	<script>
-	fetch('http://localhost:3001/api/housing')
+	fetch('/housing')
 		.then(response => response.json())
 		.then(data => {
 		const container = document.getElementById('data-container');
@@ -147,12 +147,12 @@
 		// Table body
 		const tbody = document.createElement('tbody');
 
-		data.forEach(record => {
-			const json = record.json;
+		data.data.forEach(record => {
+			const {id, jsonData: json } = record;
 
 			const tr = document.createElement('tr');
 			tr.innerHTML = `
-			<td style="padding: 8px; border: 1px solid #ccc; text-align:center;">${record.id}</td>
+			<td style="padding: 8px; border: 1px solid #ccc; text-align:center;">${id}</td>
 			<td style="padding: 8px; border: 1px solid #ccc;">${json.CSDUID}</td>
 			<td style="padding: 8px; border: 1px solid #ccc;">${json.CSD}</td>
 			<td style="padding: 8px; border: 1px solid #ccc;">${json.Period}</td>
