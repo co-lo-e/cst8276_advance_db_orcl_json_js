@@ -9,13 +9,13 @@ const testDotNotation1 = async () => {
             "IndicatorSummaryDescription"
         ]);
         
-        console.log(`Found ${result?.rows?.length || 0} rows`);
+        console.log(`Found ${result?.length || 0} rows`);
         
-        if (result && result.rows && result.rows.length > 0) {
-            result.rows.slice(0, 3).forEach((row: any, index) => {
+        if (result && result && result.length > 0) {
+            result.slice(0, 3).forEach((row: any, index) => {
                 console.log(`Row ${index + 1}:`, row);
             });
-            assert.equal(result.rows.length > 0, true);
+            assert.equal(result.length > 0, true);
             console.log("testDotNotation1 passed");
         }
     } catch (error) {
@@ -31,13 +31,13 @@ const testDotNotation2 = async () => {
             "Dimensions.Value"
         ]);
         
-        console.log(`Found ${result?.rows?.length || 0} rows`);
+        console.log(`Found ${result?.length || 0} rows`);
         
-        if (result && result.rows && result.rows.length > 0) {
-            result.rows.slice(0, 3).forEach((row: any, index) => {
+        if (result && result && result.length > 0) {
+            result.slice(0, 3).forEach((row: any, index) => {
                 console.log(`Row ${index + 1}:`, row);
             });
-            assert.equal(result.rows.length > 0, true);
+            assert.equal(result.length > 0, true);
             console.log("testDotNotation2 passed");
         }
     } catch (error) {
@@ -55,13 +55,13 @@ const testDotNotation3 = async () => {
             "UnitOfMeasure"
         ]);
         
-        console.log(`Found ${result?.rows?.length || 0} rows`);
+        console.log(`Found ${result?.length || 0} rows`);
         
-        if (result && result.rows && result.rows.length > 0) {
-            result.rows.slice(0, 2).forEach((row: any, index) => {
+        if (result && result && result.length > 0) {
+            result.slice(0, 2).forEach((row: any, index) => {
                 console.log(`Row ${index + 1}:`, row);
             });
-            assert.equal(result.rows.length > 0, true);
+            assert.equal(result.length > 0, true);
             console.log("testDotNotation3 passed");
         }
     } catch (error) {
@@ -77,10 +77,10 @@ const testDotNotationWithWhere = async () => {
             { col: "Dimensions.Value", value: "Apartment", isString: true }
         );
         
-        console.log(`Found ${result?.rows?.length || 0} rows with Dimensions.Value = 'Apartment'`);
+        console.log(`Found ${result?.length || 0} rows with Dimensions.Value = 'Apartment'`);
         
-        if (result && result.rows) {
-            result.rows.slice(0, 3).forEach((row: any, index) => {
+        if (result && result) {
+            result.slice(0, 3).forEach((row: any, index) => {
                 console.log(`Row ${index + 1}:`, row);
             });
             console.log("testDotNotationWithWhere passed");
@@ -98,10 +98,10 @@ const testDotNotationWithLike = async () => {
             { col: "Dimensions.Value", value: "Single%", isString: true }
         );
         
-        console.log(`Found ${result?.rows?.length || 0} rows with Dimensions.Value LIKE 'Single%'`);
+        console.log(`Found ${result?.length || 0} rows with Dimensions.Value LIKE 'Single%'`);
         
-        if (result && result.rows) {
-            result.rows.slice(0, 3).forEach((row: any, index) => {
+        if (result && result) {
+            result.slice(0, 3).forEach((row: any, index) => {
                 console.log(`Row ${index + 1}:`, row);
             });
             console.log("testDotNotationWithLike passed");
@@ -120,13 +120,13 @@ const testJsonQuery1 = async () => {
             "Period"
         ]);
         
-        console.log(`Found ${result?.rows?.length || 0} rows`);
+        console.log(`Found ${result?.length || 0} rows`);
         
-        if (result && result.rows && result.rows.length > 0) {
-            result.rows.slice(0, 3).forEach((row: any, index) => {
+        if (result && result && result.length > 0) {
+            result.slice(0, 3).forEach((row: any, index) => {
                 console.log(`Row ${index + 1}:`, row);
             });
-            assert.equal(result.rows.length > 0, true);
+            assert.equal(result.length > 0, true);
             console.log("testJsonQuery1 passed");
         }
     } catch (error) {
@@ -143,13 +143,13 @@ const testJsonQuery2 = async () => {
             "Dimensions.Name"
         ]);
         
-        console.log(`Found ${result?.rows?.length || 0} rows`);
+        console.log(`Found ${result?.length || 0} rows`);
         
-        if (result && result.rows && result.rows.length > 0) {
-            result.rows.slice(0, 3).forEach((row: any, index) => {
+        if (result && result && result.length > 0) {
+            result.slice(0, 3).forEach((row: any, index) => {
                 console.log(`Row ${index + 1}:`, row);
             });
-            assert.equal(result.rows.length > 0, true);
+            assert.equal(result.length > 0, true);
             console.log("testJsonQuery2 passed");
         }
     } catch (error) {
@@ -168,13 +168,13 @@ const testJsonQuery3 = async () => {
             "OriginalValue"
         ]);
         
-        console.log(`Found ${result?.rows?.length || 0} rows`);
+        console.log(`Found ${result?.length || 0} rows`);
         
-        if (result && result.rows && result.rows.length > 0) {
-            result.rows.slice(0, 2).forEach((row: any, index) => {
+        if (result && result && result.length > 0) {
+            result.slice(0, 2).forEach((row: any, index) => {
                 console.log(`Row ${index + 1}:`, row);
             });
-            assert.equal(result.rows.length > 0, true);
+            assert.equal(result.length > 0, true);
             console.log("testJsonQuery3 passed");
         }
     } catch (error) {
@@ -190,10 +190,10 @@ const testJsonQueryWithWhere = async () => {
             { col: "Period", value: "2021", isString: true }
         );
         
-        console.log(`Found ${result?.rows?.length || 0} rows with Period = '2021'`);
+        console.log(`Found ${result?.length || 0} rows with Period = '2021'`);
         
-        if (result && result.rows) {
-            result.rows.slice(0, 3).forEach((row: any, index) => {
+        if (result && result) {
+            result.slice(0, 3).forEach((row: any, index) => {
                 console.log(`Row ${index + 1}:`, row);
             });
             console.log("testJsonQueryWithWhere passed");
@@ -211,10 +211,10 @@ const testJsonQueryWithLike = async () => {
             { col: "Dimensions.Value", value: "Single%", isString: true }
         );
         
-        console.log(`Found ${result?.rows?.length || 0} rows with Dimensions.Value LIKE 'Single%'`);
+        console.log(`Found ${result?.length || 0} rows with Dimensions.Value LIKE 'Single%'`);
         
-        if (result && result.rows) {
-            result.rows.slice(0, 3).forEach((row: any, index) => {
+        if (result && result) {
+            result.slice(0, 3).forEach((row: any, index) => {
                 console.log(`Row ${index + 1}:`, row);
             });
             console.log("testJsonQueryWithLike passed");
@@ -233,16 +233,16 @@ const testComparison = async () => {
         
         console.log("\n--- readByDotNotation result ---");
         const dotResult = await readByDotNotation(columns, whereClause);
-        console.log(`Dot notation found: ${dotResult?.rows?.length || 0} rows`);
-        if (dotResult?.rows?.[0]) {
-            console.log("Sample:", dotResult.rows[0]);
+        console.log(`Dot notation found: ${dotResult?.length || 0} rows`);
+        if (dotResult?.[0]) {
+            console.log("Sample:", dotResult[0]);
         }
         
         console.log("\n--- readByJsonQuery result ---");
         const jsonResult = await readByJsonQuery(columns, whereClause);
-        console.log(`JSON query found: ${jsonResult?.rows?.length || 0} rows`);
-        if (jsonResult?.rows?.[0]) {
-            console.log("Sample:", jsonResult.rows[0]);
+        console.log(`JSON query found: ${jsonResult?.length || 0} rows`);
+        if (jsonResult?.[0]) {
+            console.log("Sample:", jsonResult[0]);
         }
         
         console.log("Comparison test completed");
