@@ -1,7 +1,7 @@
 import cors from "cors";
 import express from "express";
 import path from "node:path";
-import { createHousing, deleteHousing, getAllHousing, queryByJsonQuery, queryHousingByDotNotation, updateHousing } from "./controller";
+import { createHousing, deleteHousing, getAllHousing, getHousingById, queryByJsonQuery, queryHousingByDotNotation, updateHousing } from "./controller";
 import { testHR } from "./orcl";
 
 const app = express();
@@ -11,6 +11,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 
 app.get("/housing", getAllHousing);
+app.get("/housing/:id", getHousingById);
 app.post("/housing", createHousing);
 app.put("/housing/:id", updateHousing);
 app.delete("/housing/:id", deleteHousing);
@@ -19,6 +20,7 @@ app.get("/housing/jq", queryByJsonQuery)
 
 
 const port = 8000;
+
 app.listen(port, async () => {
 	const user = process.env.ORCL_USER;
 

@@ -1,0 +1,173 @@
+{
+  "info": {
+    "name": "Housing API Endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get Housing by id",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/housing/1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "housing",
+            1
+          ]
+        }
+      }
+    },
+    {
+      "name": "Get All Housing",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/housing",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "housing"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Query Housing by Dot Notation",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/housing/dot?select=Dimension.Value,CSDUID&where=CSD&value=Red%20Deer&string=true",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "housing",
+            "dot"
+          ],
+          "query": [
+            {
+              "key": "select",
+              "value": "Dimension.Value,CSDUID"
+            },
+            {
+              "key": "where",
+              "value": "CSD"
+            },
+            {
+              "key": "value",
+              "value": "Red Deer"
+            },
+            {
+              "key": "string",
+              "value": "true"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Query Housing by JSON Query",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/housing/jq?select=Dimension.Value,CSDUID&where=CSD&value=Red%20Deer&string=true",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "housing",
+            "jq"
+          ],
+          "query": [
+            {
+              "key": "select",
+              "value": "Dimension.Value,CSDUID"
+            },
+            {
+              "key": "where",
+              "value": "CSD"
+            },
+            {
+              "key": "value",
+              "value": "Red Deer"
+            },
+            {
+              "key": "string",
+              "value": "true"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Create New Housing Data",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8000/housing",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "housing"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"CSDUID\": \"999999\",\n  \"CSD\": \"TEST\",\n  \"Period\": \"2222\",\n  \"IndicatorSummaryDescription\": \"Housing Finished\",\n  \"Dimensions\": [\n    {\n      \"Name\": \"Housing Type\",\n      \"Value\": \"Spaceship\",\n      \"IsDisplay\": true,\n      \"DisplayOrder\": 0\n    }\n  ],\n  \"UnitOfMeasure\": \"\",\n  \"OriginalValue\": 12\n}"
+        }
+      }
+    },
+    {
+      "name": "Udpate Housing Data",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8000/housing",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "housing"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"CSDUID\": \"999999\",\n  \"CSD\": \"TEST\",\n  \"Period\": \"2222\",\n  \"IndicatorSummaryDescription\": \"Housing Finished\",\n  \"Dimensions\": [\n    {\n      \"Name\": \"Housing Type\",\n      \"Value\": \"Spaceship\",\n      \"IsDisplay\": true,\n      \"DisplayOrder\": 0\n    }\n  ],\n  \"UnitOfMeasure\": \"\",\n  \"OriginalValue\": 12\n}"
+        }
+      }
+    }
+  ]
+}

@@ -88,7 +88,7 @@ export async function getHousingById(req: Request, res: Response) {
 
 		res.status(200).json({
 			success: true,
-			data: result[0],
+			data: result,
 		});
 	} catch (error) {
 		console.error("Get housing by ID error:", error);
