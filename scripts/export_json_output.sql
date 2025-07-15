@@ -1,5 +1,7 @@
-SET PAGESIZE 0 -- avoid getting JSON_OUTPUT in the terminal and output file
-SET TRIMSPOOL ON -- removes the whitespaces in the output file
+-- avoid getting JSON_OUTPUT in the terminal and output file
+SET PAGESIZE 0
+-- removes the whitespaces in the output file
+SET TRIMSPOOL ON 
 
 -- Start spooling output to a file
 SPOOL data\json_output.json
