@@ -9,8 +9,8 @@ app.use(cors());
 
 // Oracle connection config
 const dbConfig = {
-    user: "json_user",
-    password: "mypassword",
+    user: "hr",
+    password: "password",
     connectString: "localhost:1521/FREEPDB1"
 };
 
